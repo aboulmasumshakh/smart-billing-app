@@ -1,0 +1,1764 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>স্মার্ট বিলিং অ্যাপ - পল্লী বিদ্যুৎ বিল</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, -apple-system, sans-serif;
+        }
+
+        body {
+            background: #eef2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 8px;
+            transition: background 0.3s;
+        }
+
+        .mobile-screen {
+            max-width: 340px;
+            width: 100%;
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            position: relative;
+        }
+
+        /* ওয়ালপেপার সহ ক্লাস */
+        .with-wallpaper {
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        /* ---------- লগইন স্ক্রিন ---------- */
+        .login-screen {
+            background: white;
+            padding: 30px 20px;
+            display: none;
+        }
+        .login-screen .logo-area {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .login-screen .logo-icon {
+            width: 70px;
+            height: 70px;
+            background: #f59e0b;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+            margin: 0 auto 15px;
+        }
+        .login-screen .app-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        .login-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .password-wrapper {
+            position: relative;
+        }
+        .login-input-field {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: 16px;
+            border: 1px solid #dddfe2;
+            border-radius: 12px;
+            outline: none;
+            background-color: #fafafa;
+        }
+        .login-input-field:focus {
+            border-color: #1877f2;
+            box-shadow: 0 0 0 2px #e7f3ff;
+        }
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 1.3rem;
+            color: #666;
+        }
+        .login-btn {
+            width: 100%;
+            background: #1877f2;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+        .forgot-link {
+            text-align: center;
+            margin: 16px 0;
+        }
+        .forgot-link a {
+            color: #1877f2;
+            font-size: 14px;
+            text-decoration: none;
+        }
+        hr {
+            border: none;
+            border-top: 1px solid #dadde1;
+            margin: 20px 0;
+        }
+        .create-account-btn {
+            width: 100%;
+            background: #42b72a;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+
+        /* ---------- স্ট্যাটাস বার ---------- */
+        .status-bar {
+            background: white;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            border-bottom: 1px solid #e4e6eb;
+        }
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .sync-status {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #1877f2;
+        }
+
+        /* ---------- ইনপুট স্ক্রিন ---------- */
+        .input-screen {
+            background: white;
+            padding: 20px 14px;
+        }
+
+        /* হেডার */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* বাম পাশের অফিস সেকশন */
+        .office-section {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex: 1;
+            position: relative;
+        }
+
+        .office-logo {
+            width: 40px;
+            height: 40px;
+            background: #f59e0b;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 22px;
+            font-weight: bold;
+            cursor: pointer;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .office-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1e293b;
+            max-width: 100px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .three-dots {
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0 5px;
+        }
+
+        /* অফিস মেনু */
+        .office-menu {
+            display: none;
+            position: absolute;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            width: 180px;
+            z-index: 1000;
+        }
+        .office-menu.show {
+            display: block;
+        }
+        .office-menu-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid #e4e6eb;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .office-menu-item:last-child {
+            border-bottom: none;
+        }
+        .office-menu-item:hover {
+            background: #f5f7fa;
+        }
+
+        /* ডান পাশের প্রোফাইল সেকশন */
+        .right-section {
+            display: flex;
+            align-items: center;
+            gap: 6px; /* gap কমানো হয়েছে */
+            position: relative;
+        }
+
+        .profile-section {
+            position: static; /* মোডালের জন্য স্ট্যাটিক */
+        }
+
+        .profile-icon {
+            width: 38px; /* ছোট করা হয়েছে */
+            height: 38px;
+            background: #1877f2;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* প্রোফাইল মেনু - পুরো স্ক্রিন মোডাল */
+        .profile-menu {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 2000;
+            overflow-y: auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .profile-menu.show {
+            display: block;
+        }
+
+        .profile-menu-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e4e6eb;
+        }
+        .profile-menu-header h3 {
+            font-size: 20px;
+            color: #1877f2;
+        }
+        .close-profile {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .profile-content {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e4e6eb;
+        }
+        .profile-img-large {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #1877f2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 40px;
+            background-size: cover;
+            background-position: center;
+        }
+        .profile-info {
+            flex: 1;
+        }
+        .profile-name {
+            font-weight: 700;
+            font-size: 18px;
+        }
+        .profile-email {
+            font-size: 14px;
+            color: #475569;
+        }
+        .profile-field {
+            margin-bottom: 15px;
+        }
+        .profile-field label {
+            font-size: 12px;
+            color: #64748b;
+            display: block;
+            margin-bottom: 3px;
+        }
+        .profile-field input, .profile-field select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #dddfe2;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .profile-upload-btn, .profile-save-btn {
+            background: #e4e6eb;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            width: 100%;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .profile-save-btn {
+            background: #1877f2;
+            color: white;
+        }
+
+        /* সেটিংস আইকন - ছোট */
+        .settings-icon {
+            width: 38px;
+            height: 38px;
+            background: #e4e6eb;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #1c1e21;
+            cursor: pointer;
+            border: none;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .input-field, select.input-field {
+            width: 100%;
+            padding: 16px;
+            font-size: 16px;
+            border: 1px solid #dddfe2;
+            border-radius: 12px;
+            outline: none;
+            background-color: #fafafa;
+        }
+        .generate-btn {
+            background: #42b72a;
+            border: none;
+            border-radius: 12px;
+            padding: 18px;
+            color: white;
+            font-size: 22px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 8px;
+        }
+
+        /* ---------- বিল স্ক্রিন ---------- */
+        .bill-screen {
+            background: white;
+            padding: 14px;
+            display: none;
+        }
+        .bill-screen .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+        .logo-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            background: #f8fafc;
+            padding: 10px;
+            border-radius: 14px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+        .customer p {
+            font-size: 12px;
+            color: #334155;
+            margin: 2px 0;
+        }
+        .date-box {
+            background: white;
+            padding: 6px 8px;
+            border-radius: 12px;
+            text-align: right;
+        }
+        .date-box p {
+            font-size: 11px;
+            color: #475569;
+        }
+        .due-date {
+            color: #b91c1c;
+            font-weight: 600;
+        }
+        .bill-panel {
+            border: 1px solid #e9edf2;
+            border-radius: 14px;
+            padding: 10px;
+            margin-bottom: 12px;
+        }
+        .detail-line {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px dashed #d4dae2;
+            font-size: 13px;
+        }
+        .rate-section {
+            background: #f1f5f9;
+            border-radius: 10px;
+            padding: 6px 8px;
+            margin: 8px 0;
+        }
+        .rate-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            padding: 2px 0;
+        }
+        .total-bill {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1877f2;
+        }
+        .penalty-area {
+            background: #fef2f2;
+            padding: 8px 12px;
+            border-radius: 14px;
+            margin: 10px 0;
+        }
+        .penalty-detail {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+        }
+        .penalty-amount {
+            color: #c2410c;
+            font-weight: 600;
+        }
+        .total-with-penalty {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0 0;
+            font-size: 16px;
+            font-weight: 700;
+            color: #c2410c;
+            border-top: 2px solid #d4dae2;
+        }
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 18px;
+            margin: 14px 0;
+        }
+        .icon-btn {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: #f0f4fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            border: none;
+            cursor: pointer;
+        }
+        .icon-btn.print {
+            background: #1877f2;
+            color: white;
+        }
+        .icon-btn.save {
+            background: #42b72a;
+            color: white;
+        }
+
+        /* ---------- সেটিংস স্ক্রিন ---------- */
+        .settings-screen {
+            background: white;
+            padding: 20px 14px;
+            display: none;
+        }
+        .settings-screen .header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            background: #e4e6eb;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            border: none;
+            cursor: pointer;
+        }
+        .settings-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        .settings-section {
+            margin-bottom: 25px;
+        }
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1877f2;
+            margin-bottom: 12px;
+        }
+        .time-picker {
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 12px;
+        }
+        .time-picker input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #dddfe2;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        .save-time-btn {
+            background: #1877f2;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px;
+            width: 100%;
+            cursor: pointer;
+        }
+        .customer-list-compact {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #e4e6eb;
+            border-radius: 12px;
+        }
+        .customer-item-compact {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #f0f2f5;
+            cursor: pointer;
+        }
+        .customer-item-compact:last-child {
+            border-bottom: none;
+        }
+        .customer-item-compact:hover {
+            background: #f5f7fa;
+        }
+        .customer-info {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+        .customer-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .customer-phone {
+            font-size: 12px;
+            color: #475569;
+        }
+        .customer-status {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-right: 8px;
+        }
+        .status-circle {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 2px solid;
+            cursor: pointer;
+        }
+        .status-billed {
+            background: #4caf50;
+            border-color: #2e7d32;
+        }
+        .status-unbilled {
+            background: #f44336;
+            border-color: #c62828;
+        }
+        .status-selected {
+            background: #2196f3;
+            border-color: #1565c0;
+        }
+        .status-unselected {
+            background: #9e9e9e;
+            border-color: #616161;
+        }
+        .customer-actions {
+            display: flex;
+            gap: 5px;
+        }
+        .edit-btn, .delete-btn {
+            padding: 4px 8px;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .edit-btn {
+            background: #1877f2;
+            color: white;
+        }
+        .delete-btn {
+            background: #dc2626;
+            color: white;
+        }
+        .add-customer-btn {
+            background: #42b72a;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            width: 100%;
+            font-size: 15px;
+            font-weight: 600;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 12px;
+        }
+        .theme-option {
+            display: flex;
+            gap: 15px;
+        }
+        .theme-option button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            background: #e4e6eb;
+            cursor: pointer;
+        }
+        .theme-option .active {
+            background: #1877f2;
+            color: white;
+        }
+        .color-picker-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .color-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        .color-circle.selected {
+            border-color: #1877f2;
+        }
+        .wallpaper-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+        .wallpaper-item {
+            height: 60px;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            background-size: cover;
+            background-position: center;
+        }
+        .wallpaper-item.selected {
+            border-color: #1877f2;
+        }
+        .wallpaper-upload-btn {
+            background: #e4e6eb;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            width: 100%;
+            margin-top: 8px;
+            cursor: pointer;
+        }
+        .security-item {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+        .password-field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .password-field input {
+            padding: 10px;
+            border: 1px solid #dddfe2;
+            border-radius: 8px;
+        }
+        .device-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e4e6eb;
+        }
+        .device-action {
+            color: #dc2626;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #1877f2;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        .save-settings-btn {
+            background: #1877f2;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 16px;
+            width: 100%;
+            font-size: 18px;
+            font-weight: 600;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+
+        /* ---------- মোডাল ---------- */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 5%;
+            left: 5%;
+            right: 5%;
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            z-index: 2000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal h3 {
+            margin-bottom: 15px;
+            color: #1877f2;
+        }
+        .modal input, .modal select, .modal textarea {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid #dddfe2;
+            border-radius: 8px;
+        }
+        .modal textarea {
+            min-height: 60px;
+        }
+        .slab-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 5px 0;
+        }
+        .slab-label {
+            width: 120px;
+            font-size: 13px;
+        }
+        .slab-input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #dddfe2;
+            border-radius: 6px;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .modal-buttons button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .save-customer-btn {
+            background: #1877f2;
+            color: white;
+        }
+        .close-modal-btn {
+            background: #e4e6eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-screen" id="appContainer">
+        <!-- লগইন স্ক্রিন -->
+        <div id="loginScreen" class="login-screen" style="display: block;">
+            <div class="logo-area">
+                <div class="logo-icon">⚡</div>
+                <div class="app-name">স্মার্ট বিলিং অ্যাপ</div>
+            </div>
+            <div class="login-input-group">
+                <input type="text" class="login-input-field" id="username" placeholder="ইমেইল বা মোবাইল নম্বর" value="user@example.com">
+                <div class="password-wrapper">
+                    <input type="password" class="login-input-field" id="password" placeholder="পাসওয়ার্ড">
+                    <span class="toggle-password" id="togglePassword">👁️</span>
+                </div>
+            </div>
+            <button class="login-btn" onclick="login()">লগইন</button>
+            <div class="forgot-link">
+                <a href="#" onclick="forgotPassword()">পাসওয়ার্ড ভুলে গেছেন?</a>
+            </div>
+            <hr>
+            <button class="create-account-btn" onclick="createAccount()">নতুন অ্যাকাউন্ট তৈরি</button>
+        </div>
+
+        <!-- মূল অ্যাপ অংশ -->
+        <div id="appMain" style="display: none;">
+            <!-- স্ট্যাটাস বার -->
+            <div class="status-bar">
+                <div class="status-item"><span>📋</span><span>বিল তৈরি: <span id="billedCount">0</span>/<span id="totalCustomers">0</span></span></div>
+                <div class="status-item"><span>⏳</span><span>বাকি: <span id="remainingCount">0</span></span></div>
+                <div class="sync-status" id="syncStatus"><span>🔄</span><span id="syncText">সিঙ্ক</span></div>
+            </div>
+
+            <!-- স্ক্রিন ১: ইনপুট -->
+            <div id="screen1" class="input-screen">
+                <div class="header">
+                    <!-- বাম পাশ: অফিস লোগো ও নাম -->
+                    <div class="office-section">
+                        <div class="office-logo" id="officeLogo">⚡</div>
+                        <div class="office-name" id="officeName">পল্লী বিদ্যুৎ</div>
+                        <div class="three-dots" id="officeDots">⋮</div>
+                        <!-- অফিস মেনু -->
+                        <div class="office-menu" id="officeMenu">
+                            <div class="office-menu-item" onclick="changeOfficeName()">🏢 নাম পরিবর্তন</div>
+                            <div class="office-menu-item" onclick="changeOfficeLogo()">🖼️ লোগো পরিবর্তন</div>
+                        </div>
+                        <input type="file" id="officeLogoInput" accept="image/*" style="display: none;" onchange="updateOfficeLogo(event)">
+                    </div>
+
+                    <!-- ডান পাশ: প্রোফাইল ও সেটিংস -->
+                    <div class="right-section">
+                        <div class="profile-section">
+                            <div class="profile-icon" id="profileIcon">👤</div>
+                            <!-- প্রোফাইল মেনু - পুরো স্ক্রিন মোডাল -->
+                            <div class="profile-menu" id="profileMenu">
+                                <div class="profile-menu-header">
+                                    <h3>প্রোফাইল</h3>
+                                    <button class="close-profile" onclick="closeProfileMenu()">✕</button>
+                                </div>
+                                <div class="profile-content">
+                                    <div class="profile-header">
+                                        <div class="profile-img-large" id="profileImageLarge">👤</div>
+                                        <div class="profile-info">
+                                            <div class="profile-name" id="profileNameDisplay">রহিম</div>
+                                            <div class="profile-email" id="profileEmailDisplay">rahim@email.com</div>
+                                        </div>
+                                    </div>
+                                    <div class="profile-field"><label>নাম</label><input type="text" id="profileName" value="রহিম"></div>
+                                    <div class="profile-field"><label>ঠিকানা</label><input type="text" id="profileAddress" value="ঢাকা"></div>
+                                    <div class="profile-field"><label>ফোন</label><input type="text" id="profilePhone" value="০১৭১২৩৪৫৬৭৮"></div>
+                                    <div class="profile-field"><label>ইমেইল</label><input type="email" id="profileEmail" value="rahim@email.com"></div>
+                                    <div class="profile-field"><label>বয়স</label><input type="number" id="profileAge" value="35"></div>
+                                    <div class="profile-field"><label>লিঙ্গ</label>
+                                        <select id="profileGender"><option value="পুরুষ">পুরুষ</option><option value="মহিলা">মহিলা</option></select>
+                                    </div>
+                                    <button class="profile-upload-btn" onclick="uploadProfileImage()">📷 ছবি পরিবর্তন</button>
+                                    <input type="file" id="profileImageInput" accept="image/*" style="display: none;" onchange="updateProfileImage(event)">
+                                    <button class="profile-save-btn" onclick="saveProfile()">সংরক্ষণ</button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- সেটিংস আইকন - সাইজ ছোট -->
+                        <button class="settings-icon" onclick="showSettings()">⚙️</button>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <select class="input-field" id="customerSelect"><option value="">গ্রাহক নির্বাচন করুন</option></select>
+                    <input type="number" class="input-field" id="prevUnit" placeholder="গত মাসের ইউনিট">
+                    <input type="number" class="input-field" id="currentUnit" placeholder="রানিং মাসের ইউনিট">
+                    <button class="generate-btn" onclick="prepareAndShowBill()">বিল প্রস্তুত করুন</button>
+                </div>
+            </div>
+
+            <!-- স্ক্রিন ২: বিল -->
+            <div id="screen2" class="bill-screen">
+                <div class="header">
+                    <div class="logo-group">
+                        <div class="logo-icon">⚡</div>
+                        <div class="company-name" id="billOfficeName">পল্লী বিদ্যুৎ</div>
+                    </div>
+                    <div class="creator-badge"><span>👤</span> <span id="billerName">রহিম</span></div>
+                </div>
+                <div class="info-row">
+                    <div class="customer">
+                        <p><strong>নাম:</strong> <span id="customerName"></span></p>
+                        <p><strong>পিতা:</strong> <span id="customerFather"></span></p>
+                        <p><strong>ঠিকানা:</strong> <span id="customerAddress"></span></p>
+                        <p><strong>ক্যাটাগরি:</strong> <span id="customerCategory"></span></p>
+                        <p><strong>মিটার:</strong> <span id="meterNumber"></span></p>
+                        <p><strong>SMS:</strong> <span id="smsNumber"></span></p>
+                        <p><strong>লোড:</strong> <span id="loadAmount"></span> kW</p>
+                    </div>
+                    <div class="date-box">
+                        <p>📅 তৈরির তারিখ: <span id="creationDate"></span></p>
+                        <p class="due-date">⏳ শেষ তারিখ: <span id="dueDate"></span></p>
+                    </div>
+                </div>
+                <div class="bill-panel">
+                    <div class="detail-line"><span>গত মাসের রিডিং</span><span id="prevReading">০ kWh</span></div>
+                    <div class="detail-line"><span>এ মাসের রিডিং</span><span id="currentReading">০ kWh</span></div>
+                    <div class="detail-line"><span>ব্যবহৃত ইউনিট</span><span id="usedUnits">০ kWh</span></div>
+                    <div class="rate-section" id="slabDetails"></div>
+                    <div class="detail-line"><span>মোট ইউনিট চার্জ</span><span id="unitCharge">০ টাকা</span></div>
+                    <div class="detail-line"><span>ডিমান্ড চার্জ</span><span id="demandCharge">০ টাকা</span></div>
+                    <div class="detail-line"><span>মিটার ভাড়া</span><span id="meterRent">০ টাকা</span></div>
+                    <div class="detail-line"><span>৫% ভ্যাট</span><span id="vat">০ টাকা</span></div>
+                    <div class="detail-line" style="border-bottom:none;"><span>সর্বমোট বিল</span><span class="total-bill" id="totalBill">০ টাকা</span></div>
+                </div>
+                <div class="penalty-area">
+                    <div>পরিশোধের শেষ তারিখ: <span id="penaltyDueDate"></span></div>
+                    <div class="penalty-detail"><span>জরিমানা (৫%):</span><span class="penalty-amount" id="penaltyAmount">০ টাকা</span></div>
+                    <div class="total-with-penalty"><span>জরিমানাসহ মোট</span><span id="totalWithPenalty">০ টাকা</span></div>
+                </div>
+                <div class="actions">
+                    <button class="icon-btn print" onclick="printAndSync()">🖨️</button>
+                    <button class="icon-btn save" onclick="alert('মেমোরিতে সেভ করা হয়েছে')">💾</button>
+                </div>
+            </div>
+
+            <!-- স্ক্রিন ৩: সেটিংস -->
+            <div id="screen3" class="settings-screen">
+                <div class="header">
+                    <button class="back-btn" onclick="hideSettings()">←</button>
+                    <span class="settings-title">সেটিংস</span>
+                </div>
+                <!-- টাইম সেটিং -->
+                <div class="settings-section">
+                    <div class="section-title">⏱️ ১. টাইম সেটিং</div>
+                    <div class="time-picker">
+                        <input type="datetime-local" id="customDateTime">
+                        <button class="save-time-btn" onclick="saveCustomTime()">সেভ করুন</button>
+                        <span>সংরক্ষিত: <span id="savedTimeDisplay"></span></span>
+                    </div>
+                </div>
+                <!-- গ্রাহক লিস্ট -->
+                <div class="settings-section">
+                    <div class="section-title">👥 ২. গ্রাহক লিস্ট</div>
+                    <div class="customer-list-compact" id="customerListCompact"></div>
+                    <button class="add-customer-btn" onclick="showCustomerModal()">+ নতুন গ্রাহক</button>
+                </div>
+                <!-- থিম -->
+                <div class="settings-section">
+                    <div class="section-title">🎨 ৪. থিম সেটিং</div>
+                    <div class="theme-toggle">
+                        <span>থিম মোড</span>
+                        <div class="theme-option">
+                            <button id="themeLight" class="active" onclick="setThemeMode('light')">হালকা</button>
+                            <button id="themeDark" onclick="setThemeMode('dark')">গাঢ়</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- কালার -->
+                <div class="settings-section">
+                    <div class="section-title">🌈 ৫. কালার মোড</div>
+                    <div class="color-picker-grid" id="colorPicker"></div>
+                </div>
+                <!-- ওয়ালপেপার -->
+                <div class="settings-section">
+                    <div class="section-title">🖼️ ৬. ওয়ালপেপার</div>
+                    <div class="wallpaper-grid" id="wallpaperGrid"></div>
+                    <button class="wallpaper-upload-btn" onclick="uploadWallpaper()">📷 গ্যালারি থেকে বাছাই</button>
+                    <input type="file" id="wallpaperFile" accept="image/*" style="display:none;" onchange="handleWallpaperUpload(event)">
+                </div>
+                <!-- সিকিউরিটি -->
+                <div class="settings-section">
+                    <div class="section-title">🔒 ৭. সিকিউরিটি</div>
+                    <div class="security-item">
+                        <div style="font-weight:600;">পাসওয়ার্ড পরিবর্তন</div>
+                        <div class="password-field">
+                            <input type="password" id="oldPassword" placeholder="পুরাতন পাসওয়ার্ড">
+                            <input type="password" id="newPassword" placeholder="নতুন পাসওয়ার্ড">
+                            <input type="password" id="confirmPassword" placeholder="নতুন পাসওয়ার্ড আবার">
+                            <button class="edit-btn" onclick="changePassword()">পরিবর্তন</button>
+                        </div>
+                    </div>
+                    <div class="security-item">
+                        <div style="font-weight:600;">ডিভাইস ম্যানেজমেন্ট</div>
+                        <div id="deviceList"></div>
+                        <button class="delete-btn" style="width:100%; margin-top:8px;" onclick="logoutAllDevices()">অন্য ডিভাইস লগআউট</button>
+                    </div>
+                    <div class="security-item" style="display:flex; justify-content:space-between;">
+                        <span>পিন লক</span>
+                        <label class="switch">
+                            <input type="checkbox" id="pinLockToggle" onchange="togglePinLock()">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                </div>
+                <button class="save-settings-btn" onclick="saveSettings()">সেটিংস সংরক্ষণ</button>
+            </div>
+        </div>
+
+        <!-- গ্রাহক মোডাল -->
+        <div id="customerModal" class="modal">
+            <h3 id="modalTitle">নতুন গ্রাহক</h3>
+            <input type="text" id="modalName" placeholder="গ্রাহকের নাম *">
+            <input type="text" id="modalFather" placeholder="পিতার নাম">
+            <textarea id="modalAddress" placeholder="ঠিকানা"></textarea>
+            <select id="modalCategory">
+                <option value="দরিদ্র">দরিদ্র (০-৫০, ৫১-২০০,...)</option>
+                <option value="সাধারণ" selected>সাধারণ (০-৭৫, ৭৬-২০০,...)</option>
+            </select>
+            <input type="text" id="modalPhone" placeholder="ফোন নম্বর">
+            <input type="text" id="modalMeter" placeholder="মিটার নম্বর *">
+            <input type="text" id="modalSms" placeholder="এসএমএস অ্যাকাউন্ট">
+            <input type="number" id="modalLoad" placeholder="লোড (kW)" step="0.1" value="1">
+            <input type="number" id="modalDemandCharge" placeholder="ডিমান্ড চার্জ (টাকা)" value="42">
+            <input type="number" id="modalMeterRent" placeholder="মিটার ভাড়া (টাকা)" value="10">
+            <div style="margin:10px 0; font-weight:600;">ইউনিট রেট (টাকা/ইউনিট)</div>
+            <div class="slab-row"><span class="slab-label">স্ল্যাব ১ (০-৫০/০-৭৫):</span><input type="number" class="slab-input" id="slab1" value="4.00" step="0.01"></div>
+            <div class="slab-row"><span class="slab-label">স্ল্যাব ২ (৫১/৭৬-২০০):</span><input type="number" class="slab-input" id="slab2" value="5.50" step="0.01"></div>
+            <div class="slab-row"><span class="slab-label">স্ল্যাব ৩ (২০১-৩০০):</span><input type="number" class="slab-input" id="slab3" value="6.00" step="0.01"></div>
+            <div class="slab-row"><span class="slab-label">স্ল্যাব ৪ (৩০১-৪০০):</span><input type="number" class="slab-input" id="slab4" value="6.50" step="0.01"></div>
+            <div class="slab-row"><span class="slab-label">স্ল্যাব ৫ (৪০১-৬০০):</span><input type="number" class="slab-input" id="slab5" value="7.00" step="0.01"></div>
+            <div class="slab-row"><span class="slab-label">স্ল্যাব ৬ (৬০১+):</span><input type="number" class="slab-input" id="slab6" value="7.50" step="0.01"></div>
+            <div class="modal-buttons">
+                <button class="save-customer-btn" onclick="saveCustomer()">সংরক্ষণ</button>
+                <button class="close-modal-btn" onclick="closeModal()">বন্ধ</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ---------- গ্লোবাল ডাটা ----------
+        let customers = [];
+        let editingIndex = -1;
+        let themeMode = 'light';
+        let accentColor = '#1877f2';
+        let wallpaper = '';
+        let customDateTime = '';
+        let officeName = 'পল্লী বিদ্যুৎ';
+        let officeLogo = '⚡';
+        let profileData = {
+            name: 'রহিম', address: 'ঢাকা', phone: '০১৭১২৩৪৫৬৭৮',
+            email: 'rahim@email.com', age: 35, gender: 'পুরুষ', image: ''
+        };
+        const presetColors = ['#1877f2', '#f59e0b', '#e41e3f', '#42b72a', '#9333ea', '#14b8a6'];
+        const presetWallpapers = [
+            'https://images.unsplash.com/photo-1557683316-973673baf926?w=150&h=150&fit=crop',
+            'https://images.unsplash.com/photo-1557683311-9c3fe1f4c6b0?w=150&h=150&fit=crop',
+            'https://images.unsplash.com/photo-1557682250-3f0c6f3a7d3e?w=150&h=150&fit=crop',
+            'https://images.unsplash.com/photo-1557683316-973673baf926?w=150&h=150&fit=crop',
+            'https://images.unsplash.com/photo-1557682250-3f0c6f3a7d3e?w=150&h=150&fit=crop',
+            'https://images.unsplash.com/photo-1557683316-973673baf926?w=150&h=150&fit=crop'
+        ];
+
+        // ---------- স্টোরেজ ----------
+        function loadFromStorage() {
+            const saved = localStorage.getItem('customers');
+            if (saved) customers = JSON.parse(saved);
+            else {
+                customers = [];
+                for (let i = 1; i <= 10; i++) {
+                    customers.push({
+                        id: i, name: `গ্রাহক ${i}`, father: `পিতা ${i}`, address: `ঠিকানা ${i}`,
+                        category: i % 2 ? 'সাধারণ' : 'দরিদ্র', phone: `০১৭১২৩৪${i}`, meter: `১০০০${i}`,
+                        sms: `০১৭১২৩৪${i}`, load: 1, demandCharge: 42, meterRent: 10,
+                        slabRates: [4.00, 5.50, 6.00, 6.50, 7.00, 7.50], 
+                        billed: false,
+                        selected: false
+                    });
+                }
+            }
+            const savedTheme = localStorage.getItem('themeMode');
+            if (savedTheme) themeMode = savedTheme;
+            const savedAccent = localStorage.getItem('accentColor');
+            if (savedAccent) accentColor = savedAccent;
+            const savedWallpaper = localStorage.getItem('wallpaper');
+            if (savedWallpaper) wallpaper = savedWallpaper;
+            const savedDateTime = localStorage.getItem('customDateTime');
+            if (savedDateTime) customDateTime = savedDateTime;
+            const savedOffice = localStorage.getItem('officeName');
+            if (savedOffice) officeName = savedOffice;
+            const savedOfficeLogo = localStorage.getItem('officeLogo');
+            if (savedOfficeLogo) officeLogo = savedOfficeLogo;
+            const savedProfile = localStorage.getItem('profileData');
+            if (savedProfile) profileData = JSON.parse(savedProfile);
+        }
+        function saveToStorage() {
+            localStorage.setItem('customers', JSON.stringify(customers));
+            localStorage.setItem('themeMode', themeMode);
+            localStorage.setItem('accentColor', accentColor);
+            localStorage.setItem('wallpaper', wallpaper);
+            localStorage.setItem('customDateTime', customDateTime);
+            localStorage.setItem('officeName', officeName);
+            localStorage.setItem('officeLogo', officeLogo);
+            localStorage.setItem('profileData', JSON.stringify(profileData));
+        }
+
+        // ---------- অ্যাপ্লিকেশন থিম/ওয়ালপেপার ----------
+        function applyAppearance() {
+            const container = document.getElementById('appContainer');
+            document.body.style.background = themeMode === 'dark' ? '#1e1e2f' : '#eef2f5';
+            if (wallpaper) {
+                container.style.backgroundImage = `url('${wallpaper}')`;
+                container.classList.add('with-wallpaper');
+            } else {
+                container.style.backgroundImage = '';
+                container.classList.remove('with-wallpaper');
+            }
+            document.getElementById('officeName').textContent = officeName;
+            document.getElementById('billOfficeName').textContent = officeName;
+            const logoEl = document.getElementById('officeLogo');
+            if (officeLogo && officeLogo !== '⚡') {
+                logoEl.style.backgroundImage = `url('${officeLogo}')`;
+                logoEl.style.backgroundSize = 'cover';
+                logoEl.textContent = '';
+            } else {
+                logoEl.style.backgroundImage = '';
+                logoEl.textContent = officeLogo;
+            }
+        }
+
+        // ---------- মেনু ইভেন্ট ----------
+        document.addEventListener('click', function(e) {
+            const officeMenu = document.getElementById('officeMenu');
+            if (!e.target.closest('.office-section') && officeMenu.classList.contains('show')) {
+                officeMenu.classList.remove('show');
+            }
+        });
+
+        document.getElementById('officeDots').addEventListener('click', function(e) {
+            e.stopPropagation();
+            document.getElementById('officeMenu').classList.toggle('show');
+        });
+
+        // প্রোফাইল মেনু খোলা
+        document.getElementById('profileIcon').addEventListener('click', function(e) {
+            e.stopPropagation();
+            document.getElementById('profileMenu').classList.add('show');
+            loadProfileDataToMenu();
+        });
+
+        // প্রোফাইল মেনু বন্ধ
+        function closeProfileMenu() {
+            document.getElementById('profileMenu').classList.remove('show');
+        }
+
+        // ---------- অফিস ফাংশন ----------
+        function changeOfficeName() {
+            const newName = prompt('অফিসের নতুন নাম:', officeName);
+            if (newName) { officeName = newName; applyAppearance(); saveToStorage(); }
+            document.getElementById('officeMenu').classList.remove('show');
+        }
+        function changeOfficeLogo() {
+            document.getElementById('officeLogoInput').click();
+            document.getElementById('officeMenu').classList.remove('show');
+        }
+        function updateOfficeLogo(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (ev) => { officeLogo = ev.target.result; applyAppearance(); saveToStorage(); };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // ---------- প্রোফাইল ফাংশন ----------
+        function loadProfileDataToMenu() {
+            document.getElementById('profileName').value = profileData.name;
+            document.getElementById('profileAddress').value = profileData.address;
+            document.getElementById('profilePhone').value = profileData.phone;
+            document.getElementById('profileEmail').value = profileData.email;
+            document.getElementById('profileAge').value = profileData.age;
+            document.getElementById('profileGender').value = profileData.gender;
+            document.getElementById('profileNameDisplay').textContent = profileData.name;
+            document.getElementById('profileEmailDisplay').textContent = profileData.email;
+            document.getElementById('billerName').textContent = profileData.name;
+            
+            if (profileData.image) {
+                document.getElementById('profileIcon').style.backgroundImage = `url('${profileData.image}')`;
+                document.getElementById('profileIcon').style.backgroundSize = 'cover';
+                document.getElementById('profileIcon').textContent = '';
+                document.getElementById('profileImageLarge').style.backgroundImage = `url('${profileData.image}')`;
+                document.getElementById('profileImageLarge').style.backgroundSize = 'cover';
+                document.getElementById('profileImageLarge').textContent = '';
+            } else {
+                document.getElementById('profileIcon').style.backgroundImage = '';
+                document.getElementById('profileIcon').textContent = '👤';
+                document.getElementById('profileImageLarge').style.backgroundImage = '';
+                document.getElementById('profileImageLarge').textContent = '👤';
+            }
+        }
+        function saveProfile() {
+            profileData.name = document.getElementById('profileName').value;
+            profileData.address = document.getElementById('profileAddress').value;
+            profileData.phone = document.getElementById('profilePhone').value;
+            profileData.email = document.getElementById('profileEmail').value;
+            profileData.age = document.getElementById('profileAge').value;
+            profileData.gender = document.getElementById('profileGender').value;
+            document.getElementById('profileNameDisplay').textContent = profileData.name;
+            document.getElementById('profileEmailDisplay').textContent = profileData.email;
+            document.getElementById('billerName').textContent = profileData.name;
+            saveToStorage();
+            alert('প্রোফাইল সংরক্ষিত');
+            closeProfileMenu();
+        }
+        function uploadProfileImage() { document.getElementById('profileImageInput').click(); }
+        function updateProfileImage(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    profileData.image = ev.target.result;
+                    loadProfileDataToMenu();
+                    saveToStorage();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // ---------- স্ট্যাটাস ও গ্রাহক লিস্ট ----------
+        function updateStats() {
+            const total = customers.length;
+            const billed = customers.filter(c => c.billed).length;
+            document.getElementById('billedCount').textContent = billed;
+            document.getElementById('totalCustomers').textContent = total;
+            document.getElementById('remainingCount').textContent = total - billed;
+        }
+        function updateCustomerSelect() {
+            const select = document.getElementById('customerSelect');
+            select.innerHTML = '<option value="">গ্রাহক নির্বাচন করুন</option>';
+            customers.forEach((c, i) => {
+                select.innerHTML += `<option value="${i}">${c.name} (${c.category})</option>`;
+            });
+        }
+        function renderCompactCustomerList() {
+            const container = document.getElementById('customerListCompact');
+            container.innerHTML = '';
+            customers.forEach((cust, index) => {
+                const div = document.createElement('div');
+                div.className = 'customer-item-compact';
+                
+                div.innerHTML = `
+                    <div class="customer-info">
+                        <span class="customer-name">${cust.name}</span>
+                        <span class="customer-phone">${cust.phone}</span>
+                    </div>
+                    <div class="customer-status">
+                        <div class="status-circle ${cust.billed ? 'status-billed' : 'status-unbilled'}" 
+                             title="${cust.billed ? 'বিল তৈরি হয়েছে' : 'বিল তৈরি হয়নি'}"
+                             onclick="event.stopPropagation(); toggleBilledStatus(${index})"></div>
+                        <div class="status-circle ${cust.selected ? 'status-selected' : 'status-unselected'}" 
+                             title="${cust.selected ? 'সিলেক্টেড' : 'সিলেক্ট করুন'}"
+                             onclick="event.stopPropagation(); toggleCustomerSelection(${index})"></div>
+                    </div>
+                    <div class="customer-actions">
+                        <button class="edit-btn" onclick="event.stopPropagation(); showCustomerModal(${index})">✎</button>
+                        <button class="delete-btn" onclick="event.stopPropagation(); deleteCustomer(${index})">🗑️</button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+        
+        function toggleBilledStatus(index) {
+            customers[index].billed = !customers[index].billed;
+            saveToStorage();
+            renderCompactCustomerList();
+            updateStats();
+        }
+        
+        function toggleCustomerSelection(index) {
+            customers[index].selected = !customers[index].selected;
+            saveToStorage();
+            renderCompactCustomerList();
+        }
+
+        // ---------- গ্রাহক মোডাল ----------
+        function showCustomerModal(index = -1) {
+            editingIndex = index;
+            if (index === -1) {
+                document.getElementById('modalTitle').textContent = 'নতুন গ্রাহক';
+                document.getElementById('modalName').value = '';
+                document.getElementById('modalFather').value = '';
+                document.getElementById('modalAddress').value = '';
+                document.getElementById('modalCategory').value = 'সাধারণ';
+                document.getElementById('modalPhone').value = '';
+                document.getElementById('modalMeter').value = '';
+                document.getElementById('modalSms').value = '';
+                document.getElementById('modalLoad').value = '1';
+                document.getElementById('modalDemandCharge').value = '42';
+                document.getElementById('modalMeterRent').value = '10';
+                document.getElementById('slab1').value = '4.00';
+                document.getElementById('slab2').value = '5.50';
+                document.getElementById('slab3').value = '6.00';
+                document.getElementById('slab4').value = '6.50';
+                document.getElementById('slab5').value = '7.00';
+                document.getElementById('slab6').value = '7.50';
+            } else {
+                const c = customers[index];
+                document.getElementById('modalTitle').textContent = 'গ্রাহক সম্পাদনা';
+                document.getElementById('modalName').value = c.name;
+                document.getElementById('modalFather').value = c.father || '';
+                document.getElementById('modalAddress').value = c.address || '';
+                document.getElementById('modalCategory').value = c.category;
+                document.getElementById('modalPhone').value = c.phone || '';
+                document.getElementById('modalMeter').value = c.meter;
+                document.getElementById('modalSms').value = c.sms || '';
+                document.getElementById('modalLoad').value = c.load;
+                document.getElementById('modalDemandCharge').value = c.demandCharge;
+                document.getElementById('modalMeterRent').value = c.meterRent;
+                const slabs = c.slabRates || [4.00,5.50,6.00,6.50,7.00,7.50];
+                document.getElementById('slab1').value = slabs[0];
+                document.getElementById('slab2').value = slabs[1];
+                document.getElementById('slab3').value = slabs[2];
+                document.getElementById('slab4').value = slabs[3];
+                document.getElementById('slab5').value = slabs[4];
+                document.getElementById('slab6').value = slabs[5];
+            }
+            document.getElementById('customerModal').style.display = 'block';
+        }
+        function saveCustomer() {
+            const name = document.getElementById('modalName').value.trim();
+            const meter = document.getElementById('modalMeter').value.trim();
+            if (!name || !meter) { alert('নাম ও মিটার নম্বর দিন'); return; }
+            const slabs = [
+                parseFloat(document.getElementById('slab1').value) || 0,
+                parseFloat(document.getElementById('slab2').value) || 0,
+                parseFloat(document.getElementById('slab3').value) || 0,
+                parseFloat(document.getElementById('slab4').value) || 0,
+                parseFloat(document.getElementById('slab5').value) || 0,
+                parseFloat(document.getElementById('slab6').value) || 0
+            ];
+            const cust = {
+                id: editingIndex===-1 ? (customers.length+1) : customers[editingIndex].id,
+                name, father: document.getElementById('modalFather').value,
+                address: document.getElementById('modalAddress').value,
+                category: document.getElementById('modalCategory').value,
+                phone: document.getElementById('modalPhone').value,
+                meter, sms: document.getElementById('modalSms').value,
+                load: parseFloat(document.getElementById('modalLoad').value) || 1,
+                demandCharge: parseFloat(document.getElementById('modalDemandCharge').value) || 0,
+                meterRent: parseFloat(document.getElementById('modalMeterRent').value) || 0,
+                slabRates: slabs,
+                billed: editingIndex===-1 ? false : customers[editingIndex].billed,
+                selected: editingIndex===-1 ? false : customers[editingIndex].selected
+            };
+            if (editingIndex === -1) customers.push(cust);
+            else customers[editingIndex] = cust;
+            saveToStorage();
+            closeModal();
+            renderCompactCustomerList();
+            updateCustomerSelect();
+            updateStats();
+        }
+        function deleteCustomer(index) {
+            if (customers.length <= 1) { alert('অন্তত একজন গ্রাহক রাখুন'); return; }
+            customers.splice(index, 1);
+            saveToStorage();
+            renderCompactCustomerList();
+            updateCustomerSelect();
+            updateStats();
+        }
+        function closeModal() { document.getElementById('customerModal').style.display = 'none'; }
+
+        // ---------- টাইম সেটিং ----------
+        function saveCustomTime() {
+            const dt = document.getElementById('customDateTime').value;
+            if (dt) { 
+                customDateTime = dt; 
+                localStorage.setItem('customDateTime', dt);
+                document.getElementById('savedTimeDisplay').textContent = dt.replace('T',' ');
+            }
+            else alert('তারিখ ও সময় নির্বাচন করুন');
+        }
+
+        // ---------- বিল তৈরি ----------
+        function prepareAndShowBill() {
+            const idx = document.getElementById('customerSelect').value;
+            if (idx === '') { alert('গ্রাহক নির্বাচন করুন'); return; }
+            const cust = customers[idx];
+            const prev = parseFloat(document.getElementById('prevUnit').value);
+            const curr = parseFloat(document.getElementById('currentUnit').value);
+            if (isNaN(prev) || isNaN(curr) || curr <= prev) { alert('সঠিক ইউনিট দিন'); return; }
+            const used = curr - prev;
+            const slabs = cust.slabRates;
+            let slabLimits = cust.category === 'দরিদ্র' ? [50,200,300,400,600,Infinity] : [75,200,300,400,600,Infinity];
+            let unitCharge = 0, remaining = used;
+            const slabCharges = [];
+            for (let i=0; i<slabLimits.length; i++) {
+                const prevLimit = i===0 ? 0 : slabLimits[i-1];
+                const limit = slabLimits[i];
+                const units = Math.min(remaining, limit - prevLimit);
+                const charge = units * slabs[i];
+                unitCharge += charge;
+                if (units > 0) {
+                    slabCharges.push({ 
+                        range: `${prevLimit+1}-${limit===Infinity?'∞':limit}`, 
+                        units, 
+                        rate: slabs[i], 
+                        charge 
+                    });
+                }
+                remaining -= units;
+                if (remaining <= 0) break;
+            }
+            const demand = cust.demandCharge, rent = cust.meterRent, vat = Math.round(unitCharge*0.05);
+            const total = Math.round(unitCharge + demand + rent + vat);
+            const penalty = Math.round(total * 0.05);
+            const totalWithPenalty = total + penalty;
+
+            let slabHtml = '';
+            slabCharges.forEach(s => { 
+                slabHtml += `<div class="rate-item"><span>${s.range} ইউ (${s.rate} টাকা)</span><span>${Math.round(s.charge)} টাকা</span></div>`; 
+            });
+            document.getElementById('slabDetails').innerHTML = slabHtml;
+            document.getElementById('customerName').textContent = cust.name;
+            document.getElementById('customerFather').textContent = cust.father || '-';
+            document.getElementById('customerAddress').textContent = cust.address || '-';
+            document.getElementById('customerCategory').textContent = cust.category;
+            document.getElementById('meterNumber').textContent = cust.meter;
+            document.getElementById('smsNumber').textContent = cust.sms;
+            document.getElementById('loadAmount').textContent = cust.load;
+            document.getElementById('prevReading').textContent = prev + ' kWh';
+            document.getElementById('currentReading').textContent = curr + ' kWh';
+            document.getElementById('usedUnits').textContent = used + ' kWh';
+            document.getElementById('unitCharge').textContent = Math.round(unitCharge) + ' টাকা';
+            document.getElementById('demandCharge').textContent = demand + ' টাকা';
+            document.getElementById('meterRent').textContent = rent + ' টাকা';
+            document.getElementById('vat').textContent = vat + ' টাকা';
+            document.getElementById('totalBill').textContent = total + ' টাকা';
+            document.getElementById('penaltyAmount').textContent = penalty + ' টাকা';
+            document.getElementById('totalWithPenalty').textContent = totalWithPenalty + ' টাকা';
+            
+            if (customDateTime) {
+                const d = new Date(customDateTime);
+                document.getElementById('creationDate').textContent = d.toLocaleString('bn-BD');
+            } else {
+                const d = new Date();
+                document.getElementById('creationDate').textContent = d.toLocaleDateString('bn-BD') + ' ' + d.toLocaleTimeString('bn-BD');
+            }
+            
+            const today = new Date();
+            const dueDate = new Date(today);
+            dueDate.setDate(today.getDate() + 10);
+            const penaltyDate = new Date(today);
+            penaltyDate.setDate(today.getDate() + 17);
+            
+            document.getElementById('dueDate').textContent = dueDate.toLocaleDateString('bn-BD');
+            document.getElementById('penaltyDueDate').textContent = penaltyDate.toLocaleDateString('bn-BD');
+            
+            document.getElementById('screen1').style.display = 'none';
+            document.getElementById('screen2').style.display = 'block';
+        }
+
+        // ---------- প্রিন্ট ও সিঙ্ক ----------
+        function printAndSync() {
+            const idx = document.getElementById('customerSelect').value;
+            if (idx !== '') { 
+                customers[idx].billed = true; 
+                saveToStorage(); 
+                updateStats();
+                renderCompactCustomerList();
+            }
+            if (navigator.onLine) {
+                document.getElementById('syncStatus').style.color = '#1877f2';
+                document.getElementById('syncText').textContent = 'সার্ভারে পাঠানো হয়েছে';
+            } else {
+                document.getElementById('syncStatus').style.color = '#e41e3f';
+                document.getElementById('syncText').textContent = 'অফলাইন';
+                let pending = JSON.parse(localStorage.getItem('pendingBills') || '[]');
+                pending.push({ customer: customers[idx]?.name, amount: document.getElementById('totalBill').textContent });
+                localStorage.setItem('pendingBills', JSON.stringify(pending));
+            }
+            window.print();
+        }
+
+        // ---------- স্ক্রিন নেভিগেশন ----------
+        function showSettings() {
+            document.getElementById('screen1').style.display = 'none';
+            document.getElementById('screen2').style.display = 'none';
+            document.getElementById('screen3').style.display = 'block';
+            loadSettingsData();
+        }
+        function hideSettings() {
+            document.getElementById('screen1').style.display = 'block';
+            document.getElementById('screen2').style.display = 'none';
+            document.getElementById('screen3').style.display = 'none';
+        }
+        function loadSettingsData() {
+            if (customDateTime) {
+                document.getElementById('customDateTime').value = customDateTime;
+                document.getElementById('savedTimeDisplay').textContent = customDateTime.replace('T',' ');
+            }
+            renderCompactCustomerList();
+            renderColorPicker();
+            renderWallpaperGrid();
+            document.querySelectorAll('.theme-option button').forEach(b=>b.classList.remove('active'));
+            document.getElementById(themeMode==='light'?'themeLight':'themeDark').classList.add('active');
+            const pinLock = localStorage.getItem('pinLock')==='true';
+            document.getElementById('pinLockToggle').checked = pinLock;
+            renderDeviceList();
+        }
+        function saveSettings() {
+            saveToStorage();
+            applyAppearance();
+            alert('সেটিংস সংরক্ষিত');
+            hideSettings();
+        }
+
+        // ---------- থিম, কালার, ওয়ালপেপার ----------
+        function setThemeMode(mode) {
+            themeMode = mode;
+            document.querySelectorAll('.theme-option button').forEach(b=>b.classList.remove('active'));
+            document.getElementById(mode==='light'?'themeLight':'themeDark').classList.add('active');
+            applyAppearance();
+        }
+        function renderColorPicker() {
+            const container = document.getElementById('colorPicker');
+            container.innerHTML = '';
+            presetColors.forEach(c => {
+                const div = document.createElement('div');
+                div.className = 'color-circle' + (c===accentColor ? ' selected' : '');
+                div.style.backgroundColor = c;
+                div.onclick = () => {
+                    document.querySelectorAll('.color-circle').forEach(d=>d.classList.remove('selected'));
+                    div.classList.add('selected');
+                    accentColor = c;
+                    applyAppearance();
+                };
+                container.appendChild(div);
+            });
+        }
+        function renderWallpaperGrid() {
+            const grid = document.getElementById('wallpaperGrid');
+            grid.innerHTML = '';
+            presetWallpapers.forEach((url,i) => {
+                const div = document.createElement('div');
+                div.className = 'wallpaper-item' + (url===wallpaper?' selected':'');
+                div.style.backgroundImage = `url('${url}')`;
+                div.onclick = () => {
+                    document.querySelectorAll('.wallpaper-item').forEach(w=>w.classList.remove('selected'));
+                    div.classList.add('selected');
+                    wallpaper = url;
+                    applyAppearance();
+                };
+                grid.appendChild(div);
+            });
+            const noneDiv = document.createElement('div');
+            noneDiv.className = 'wallpaper-item';
+            noneDiv.style.background = '#e4e6eb';
+            noneDiv.style.display = 'flex'; noneDiv.style.alignItems = 'center'; noneDiv.style.justifyContent = 'center';
+            noneDiv.textContent = 'কোনটি না';
+            noneDiv.onclick = () => {
+                document.querySelectorAll('.wallpaper-item').forEach(w=>w.classList.remove('selected'));
+                noneDiv.classList.add('selected');
+                wallpaper = '';
+                applyAppearance();
+            };
+            grid.appendChild(noneDiv);
+        }
+        function uploadWallpaper() { document.getElementById('wallpaperFile').click(); }
+        function handleWallpaperUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (ev) => { 
+                    wallpaper = ev.target.result; 
+                    applyAppearance();
+                    document.querySelectorAll('.wallpaper-item').forEach(w=>w.classList.remove('selected'));
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // ---------- সিকিউরিটি ----------
+        function changePassword() {
+            const old = document.getElementById('oldPassword').value;
+            const np = document.getElementById('newPassword').value;
+            const cf = document.getElementById('confirmPassword').value;
+            if (!old || !np || !cf) { alert('সব ঘর পূরণ করুন'); return; }
+            if (np !== cf) { alert('নতুন পাসওয়ার্ড মেলেনি'); return; }
+            if (old !== '1234') { alert('পুরাতন পাসওয়ার্ড ভুল (ডেমো: 1234)'); return; }
+            alert('পাসওয়ার্ড পরিবর্তন হয়েছে (ডেমো)');
+        }
+        function togglePinLock() {
+            const chk = document.getElementById('pinLockToggle').checked;
+            localStorage.setItem('pinLock', chk);
+            alert(chk ? 'পিন লক সক্রিয়' : 'পিন লক নিষ্ক্রিয়');
+        }
+        function renderDeviceList() {
+            const dev = document.getElementById('deviceList');
+            dev.innerHTML = `
+                <div class="device-item"><div><strong>বর্তমান (Chrome)</strong></div><div style="color:#1877f2;">বর্তমান</div></div>
+                <div class="device-item"><div><strong>অজানা (Firefox)</strong><br><small>শেষ: ২ ঘন্টা আগে</small></div><span class="device-action" onclick="removeDevice(this)">সরান</span></div>
+                <div class="device-item"><div><strong>মোবাইল (Android)</strong><br><small>শেষ: গতকাল</small></div><span class="device-action" onclick="removeDevice(this)">সরান</span></div>
+            `;
+        }
+        function removeDevice(el) { 
+            alert('ডিভাইস সরানো হয়েছে (ডেমো)'); 
+            el.parentElement.remove(); 
+        }
+        function logoutAllDevices() { 
+            alert('অন্য সব ডিভাইস লগআউট করা হয়েছে'); 
+        }
+
+        // ---------- নেটওয়ার্ক ইভেন্ট ----------
+        window.addEventListener('online', ()=>{
+            document.getElementById('syncStatus').style.color = '#1877f2';
+            document.getElementById('syncText').textContent = 'সিঙ্ক সম্পন্ন';
+        });
+        window.addEventListener('offline', ()=>{
+            document.getElementById('syncStatus').style.color = '#e41e3f';
+            document.getElementById('syncText').textContent = 'অফলাইন';
+        });
+
+        // ---------- লগইন ----------
+        function login() {
+            if (document.getElementById('password').value === '1234') {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('appMain').style.display = 'block';
+                loadFromStorage();
+                updateCustomerSelect();
+                updateStats();
+                applyAppearance();
+                loadProfileDataToMenu();
+                document.getElementById('screen1').style.display = 'block';
+                document.getElementById('screen2').style.display = 'none';
+                document.getElementById('screen3').style.display = 'none';
+            } else alert('পাসওয়ার্ড ভুল (1234)');
+        }
+        function forgotPassword() { alert('পাসওয়ার্ড রিসেট লিংক পাঠানো হবে (ডেমো)'); }
+        function createAccount() { alert('নতুন অ্যাকাউন্ট তৈরি (ডেমো)'); }
+
+        // ---------- প্রারম্ভিক লোড ----------
+        window.onload = function() {
+            document.getElementById('loginScreen').style.display = 'block';
+            document.getElementById('appMain').style.display = 'none';
+            document.getElementById('togglePassword').addEventListener('click', function() {
+                const pwd = document.getElementById('password');
+                pwd.type = pwd.type === 'password' ? 'text' : 'password';
+                this.textContent = pwd.type === 'password' ? '👁️' : '👁️‍🗨️';
+            });
+        };
+    </script>
+</body>
+</html>
